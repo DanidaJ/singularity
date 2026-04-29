@@ -1,0 +1,393 @@
+/* ========================================
+   Black Hole Simulation — HUD Styles
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --color-bg: #000000;
+  --color-text: #e0e0e0;
+  --color-text-dim: #666666;
+  --color-accent: #ff6b35;
+  --color-accent-blue: #4fc3f7;
+  --color-glass-bg: rgba(10, 10, 20, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  font-family: var(--font-primary);
+  color: var(--color-text);
+  cursor: grab;
+  -webkit-font-smoothing: antialiased;
+}
+
+body:active {
+  cursor: grabbing;
+}
+
+/* ---- Canvas ---- */
+#webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+/* ---- HUD Overlay ---- */
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  animation: hudFadeIn 1.5s ease 2s forwards;
+}
+
+@keyframes hudFadeIn {
+  to { opacity: 1; }
+}
+
+.hud-top-left {
+  position: absolute;
+  top: 32px;
+  left: 36px;
+}
+
+.hud-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  color: var(--color-text);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hud-subtitle {
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  transition: opacity 0.4s ease;
+}
+
+/* ---- Stats Panel (Bottom Left) ---- */
+.hud-bottom-left {
+  position: absolute;
+  bottom: 90px;
+  left: 36px;
+}
+
+.hud-stats {
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 220px;
+  transition: all 0.3s ease;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.stat-row + .stat-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-accent-blue);
+}
+
+/* ---- Info Panel (Bottom Right) ---- */
+.hud-bottom-right {
+  position: absolute;
+  bottom: 90px;
+  right: 36px;
+}
+
+.hud-info-panel {
+  text-align: right;
+}
+
+.info-text {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--color-text-dim);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.info-text-small {
+  font-size: 0.55rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   Preset Selector Bar
+   ============================================ */
+.preset-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(8, 8, 18, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  opacity: 0;
+  animation: presetBarFadeIn 0.8s ease 2.5s forwards;
+}
+
+@keyframes presetBarFadeIn {
+  to { opacity: 1; }
+}
+
+.preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  color: var(--color-text-dim);
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.preset-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at center, rgba(255, 107, 53, 0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.preset-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+}
+
+.preset-btn:hover::before {
+  opacity: 1;
+}
+
+.preset-btn.active {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: rgba(255, 107, 53, 0.25);
+  color: var(--color-text);
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.08), inset 0 0 20px rgba(255, 107, 53, 0.05);
+}
+
+.preset-btn.active::before {
+  opacity: 1;
+}
+
+.preset-btn.active .preset-name {
+  color: var(--color-accent);
+}
+
+.preset-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.preset-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 1px;
+}
+
+.preset-name {
+  font-family: var(--font-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: inherit;
+  transition: color 0.35s ease;
+  white-space: nowrap;
+}
+
+.preset-desc {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+/* Active pulse animation on the active button border */
+.preset-btn.active {
+  animation: presetActivePulse 3s ease-in-out infinite;
+}
+
+@keyframes presetActivePulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.08), inset 0 0 20px rgba(255, 107, 53, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.15), inset 0 0 25px rgba(255, 107, 53, 0.08);
+  }
+}
+
+/* ---- Loading Screen ---- */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 1s ease, visibility 1s ease;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.loading-ring {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  border-top: 2px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+}
+
+/* ---- lil-gui overrides ---- */
+:root {
+  --lil-gui-width: 280px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .hud-top-left {
+    top: 16px;
+    left: 16px;
+  }
+  .hud-title {
+    font-size: 0.85rem;
+  }
+  .hud-bottom-left {
+    bottom: 80px;
+    left: 16px;
+  }
+  .hud-bottom-right {
+    bottom: 80px;
+    right: 16px;
+  }
+  .hud-stats {
+    min-width: 180px;
+    padding: 12px 14px;
+  }
+
+  /* Preset bar responsive */
+  .preset-bar {
+    bottom: 12px;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .preset-btn {
+    padding: 8px 10px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .preset-icon {
+    font-size: 1rem;
+  }
+
+  .preset-info {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .preset-btn {
+    padding: 8px 12px;
+  }
+}

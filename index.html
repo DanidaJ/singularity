@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive 3D black hole simulation with real Schwarzschild geodesic physics, gravitational lensing, and accretion disk." />
+  <title>Black Hole Simulation — Schwarzschild Geodesic Raymarcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/index.css" />
+</head>
+<body>
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- HUD Overlay -->
+  <div id="hud" class="hud">
+    <div class="hud-top-left">
+      <h1 class="hud-title">SINGULARITY</h1>
+      <p class="hud-subtitle">Schwarzschild Geodesic Simulation</p>
+    </div>
+
+    <div class="hud-bottom-left">
+      <div class="hud-stats">
+        <div class="stat-row">
+          <span class="stat-label">FPS</span>
+          <span class="stat-value" id="fps-counter">60</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">SCHWARZSCHILD RADIUS</span>
+          <span class="stat-value" id="rs-display">2.00</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">PHOTON SPHERE</span>
+          <span class="stat-value" id="photon-sphere-display">3.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-bottom-right">
+      <div class="hud-info-panel">
+        <p class="info-text">Drag to orbit &bull; Scroll to zoom</p>
+        <p class="info-text-small">Geodesic integration via Leapfrog &bull; ~200 steps/ray</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preset Selector Bar -->
+  <div id="preset-bar" class="preset-bar">
+    <button class="preset-btn active" data-preset="custom" id="preset-custom">
+      <span class="preset-icon">⚫</span>
+      <div class="preset-info">
+        <span class="preset-name">Custom</span>
+        <span class="preset-desc">Free-form</span>
+      </div>
+    </button>
+    <button class="preset-btn" data-preset="interstellar" id="preset-interstellar">
+      <span class="preset-icon">🌀</span>
+      <div class="preset-info">
+        <span class="preset-name">Gargantua</span>
+        <span class="preset-desc">Interstellar</span>
+      </div>
+    </button>
+    <button class="preset-btn" data-preset="quasar" id="preset-quasar">
+      <span class="preset-icon">💥</span>
+      <div class="preset-info">
+        <span class="preset-name">TON 618</span>
+        <span class="preset-desc">Quasar</span>
+      </div>
+    </button>
+    <button class="preset-btn" data-preset="supermassive" id="preset-supermassive">
+      <span class="preset-icon">🌌</span>
+      <div class="preset-info">
+        <span class="preset-name">Sgr A*</span>
+        <span class="preset-desc">Milky Way</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Loading screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-ring"></div>
+      <p class="loading-text">Warping Spacetime...</p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

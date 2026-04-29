@@ -1,0 +1,21 @@
+services:
+  client:
+    image: ghcr.io/danidaj/singularity:latest
+    container_name: singularity-client
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    expose:
+      - "3000"
+    networks:
+      - portfolio-net
+      - singularity-network
+
+networks:
+  singularity-network:
+    driver: bridge
+  portfolio-net:
+    external: true

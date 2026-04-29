@@ -1,0 +1,53 @@
+name: Deploy Singularity (Production)
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: danidaj/singularity
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: danidaj
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and Push Singularity Client
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /root/singularity
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u danidaj --password-stdin
+            docker compose -f docker-compose.prod.yml pull client
+            docker compose -f docker-compose.prod.yml up -d client
+            docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml logs --tail=120 client
+            if [ "$(docker inspect -f '{{.State.Running}}' singularity-client)" != "true" ]; then
+              echo "singularity-client is not running after deploy"
+              exit 1
+            fi
+            docker image prune -f
