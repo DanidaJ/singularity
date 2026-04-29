@@ -32,12 +32,74 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
+      - name: Preflight deploy diagnostics (sanitized)
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          echo "Host: ${VPS_HOST}"
+          echo "Username: ${VPS_USERNAME}"
+
+          if [ -z "${VPS_HOST}" ]; then
+            echo "VPS_HOST is empty"
+            exit 1
+          fi
+
+          if [ -z "${VPS_USERNAME}" ]; then
+            echo "VPS_USERNAME is empty"
+            exit 1
+          fi
+
+          if [ -z "${VPS_SSH_KEY}" ]; then
+            echo "VPS_SSH_KEY is empty"
+            exit 1
+          fi
+
+          echo "VPS_SSH_KEY length: ${#VPS_SSH_KEY}"
+
+          key_file="$(mktemp)"
+          pub_file="$(mktemp)"
+
+          printf '%s\n' "${VPS_SSH_KEY}" > "${key_file}"
+          chmod 600 "${key_file}"
+
+          if ssh-keygen -y -f "${key_file}" > "${pub_file}" 2>/tmp/key_parse_error.log; then
+            echo "VPS_SSH_KEY parse: OK"
+            ssh-keygen -lf "${pub_file}" | awk '{print "Derived public key fingerprint:", $2}'
+          else
+            echo "VPS_SSH_KEY parse: FAILED"
+            cat /tmp/key_parse_error.log
+            exit 1
+          fi
+
+          rm -f "${key_file}" "${pub_file}" /tmp/key_parse_error.log
+
+      - name: SSH connectivity check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 30s
+          command_timeout: 30s
+          debug: true
+          script: |
+            set -e
+            echo "Connected to $(hostname) as $(whoami)"
+            pwd
+
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 60s
+          command_timeout: 10m
+          debug: true
           script: |
             set -e
             cd /root/singularity
